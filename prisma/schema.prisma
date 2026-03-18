@@ -1,0 +1,48 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model Member {
+  id          String   @id @default(uuid())
+  surname    String
+  firstname    String
+  phoneNumber String   @unique
+  email String   @unique
+  voicePart   String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  dateOfBirth DateTime?
+  gender        String
+profile_pic  String?
+  tasks       Task[]
+  
+}
+
+model Task {
+  id              String   @id @default(uuid())
+  memberId        String
+  notes        String
+  performanceDate DateTime
+  isTaskDone       Boolean @default(false)
+  reminderSent    Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  member          Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  role             roleType
+  @@index([performanceDate])
+}
+
+
+enum roleType {
+  RESPNSORIAL_PASALM
+  COMMUNION_SOLO
+  
+}
+ // @@unique([memberId, performanceDate])

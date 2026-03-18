@@ -1,4 +1,33 @@
 {
   "name": "HTC_Notification_system",
-  "packageManager": "yarn@4.9.1"
+  "packageManager": "yarn@4.9.1",
+  "dependencies": {
+    "@prisma/client": "^6.16.1",
+    "bullmq": "^5.71.0",
+    "cloudinary": "^2.9.0",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "ioredis": "^5.10.0",
+    "joi": "^18.0.2",
+    "nodemon": "^3.1.14",
+    "prisma": "^6.16.1",
+    "qrcode-terminal": "^0.12.0",
+    "whatsapp-web.js": "^1.34.6",
+    "xlsx": "^0.18.5"
+  },
+  "scripts": {
+    "dev_bef": "tsx watch src/server.ts",
+    "dev": "nodemon --exec ts-node src/server.ts",
+    "prisma_studio": "npx prisma studio",
+    "build": "tsc",
+    "runstart": "nodemon src/server.ts",
+    "start": "node dist/server.js"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.3.3",
+    "ts-node-dev": "^2.0.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
 }
