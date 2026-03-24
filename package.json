@@ -21,7 +21,9 @@
     "prisma_studio": "npx prisma studio",
     "build": "tsc",
     "runstart": "nodemon src/server.ts",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "worker_test":"nodemon src/queue/notifiation.worker.ts",
+    "worker":"ts-node src/queue/notifiation.worker.ts"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",

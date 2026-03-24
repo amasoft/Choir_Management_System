@@ -1,6 +1,7 @@
+import { addNotificationJob } from "../../queue/notification.queue";
 import { messageLogger } from "../../util";
 import { composeMessage } from "../../Utils/Helpers";
-import { whatsappClient } from "../../whatsapp/whatsapp.client";
+// import { whatsappClient } from "../../whatsapp/whatsapp.client";
 
 interface Member {
   id: string;
@@ -30,33 +31,60 @@ interface Task {
 export class Notification {
   static async processTask(result: Task[]) {
     try {
-      // Filter tasks by role
-    const communionSoloTasks = result.filter((task: Task) => task.role === "COMMUNION_SOLO");
-    const responsorialPsalmTasks = result.filter((task: Task) => task.role === "RESPNSORIAL_PASALM");
+      const communionSoloTasks = result.filter((task: Task) => task.role === "COMMUNION_SOLO");
+      const responsorialPsalmTasks = result.filter((task: Task) => task.role === "RESPNSORIAL_PASALM");
+      const roles = ["COMMUNION_SOLO", "RESPNSORIAL_PASALM"];
 
-    // console.log("COMMUNION_SOLO tasks:", communionSoloTasks.length);
-    // console.log("RESPNSORIAL_PASALM tasks:", responsorialPsalmTasks.length);
+      for (const role of roles) {
+        const tasks = result.filter(task => task.role == role)
 
-//+2347063011279
-    //check compose message 
-    const [message,userNumber] = await composeMessage(communionSoloTasks)
-    //send message via whatsapp
-    if (!message) {
-      console.log("No message to send");
-      return;
-    }
-    const isNumberRegistered=await whatsappClient.isNumberRegistered(userNumber)
-    if(isNumberRegistered){
-    messageLogger('Sending message-------',`.........`);
+        if (tasks.length == 0) {
+          messageLogger('No TASK role :: LOOP', role)
+        }
 
-      await whatsappClient.sendMessage(userNumber, message);
-    }
+        // messageLogger(' TASKS  :: LOOP', tasks)
 
-    messageLogger('getMessage',`message: ${message}::::usernumber:${userNumber}`);
-    messageLogger('isNumberRegistered',isNumberRegistered);
+const { message, phoneNumbers } = await composeMessage(tasks);
+
+for (const number of phoneNumbers) {
+  await addNotificationJob({
+    message,
+    userNumber: number
+    // role,
+  });
+}
+
+
+        // const [message, userNumber,cleanPhone_1] = await composeMessage(tasks)
+        // messageLogger(`Compose Message:::${userNumber}:${cleanPhone_1}`, message)
+        // var data={message,userNumber}
+        // await addNotificationJob(data)
+      }
+      // console.log("COMMUNION_SOLO tasks:", communionSoloTasks.length);
+      // console.log("RESPNSORIAL_PASALM tasks:", responsorialPsalmTasks.length);
+
+      //+2347063011279
+      //check compose message 
+
+      // const [message,userNumber] = await composeMessage(task)
+      // messageLogger('Compose Message',message)
+      // //send message via whatsapp
+      // if (!message) {
+      //   console.log("No message to send");
+      //   return;
+      // }
+      // const isNumberRegistered=await whatsappClient.isNumberRegistered(userNumber)
+      // if(isNumberRegistered){
+      // messageLogger('Sending message-------',`.........`);
+
+      //   await whatsappClient.sendMessage(userNumber, message);
+      // }
+
+      // messageLogger('getMessage',`message: ${message}::::usernumber:${userNumber}`);
+      // messageLogger('isNumberRegistered',isNumberRegistered);
     } catch (error) {
-      console.log('Notifcation error'+error)
+      console.log('Notifcation error' + error)
     }
-    
+
   }
 }

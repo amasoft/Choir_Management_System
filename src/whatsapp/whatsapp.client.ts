@@ -82,11 +82,11 @@ class WhatsAppClient {
 
     if (!isRegistered) {
       console.log("User is not on WhatsApp ");
-      return;
+      return false;
     }
-    messageLogger(`isNumberRegistered`,isRegistered)
+    // messageLogger(`isNumberRegistered`,isRegistered)
 
-    return isRegistered
+    return true
 
   }
 

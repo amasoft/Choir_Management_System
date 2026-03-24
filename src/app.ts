@@ -1,5 +1,5 @@
 import express from "express";
-import { whatsappClient } from "./whatsapp/whatsapp.client";
+// import { whatsappClient } from "./whatsapp/whatsapp.client";
 import { messageLogger } from "./util";
 import apiRouter from "./modules"
 import importExcelData from "./Utils/fileutils"
@@ -26,7 +26,7 @@ app.post("/api/v1/send-test", async (req, res) => {
   const { phone, message } = req.body;
 messageLogger(`phone`,phone)
   try {
-    await whatsappClient.sendMessage(phone, message);
+    // await whatsappClient.sendMessage(phone, message);
     res.json({ success: true });
   } catch (error: any) {
     res.status(500).json({
