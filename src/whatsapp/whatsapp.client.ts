@@ -92,6 +92,7 @@ class WhatsAppClient {
 
   // ✅ Wait until WhatsApp is ready
   public async waitUntilReady(): Promise<void> {
+    messageLogger(`waiting`,'loading....')
     if (this.isReady) return;
 
     return new Promise((resolve) => {

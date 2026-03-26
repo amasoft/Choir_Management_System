@@ -45,8 +45,12 @@ export class TasksController {
     }
     static async getNextSundayTasks(req: Request, res: Response) {
         try {
-            const tasks = await tasksService.fetchNextTasks() 
+            const tasks = await tasksService.fetchNextTasks()
+            if (!tasks.task || tasks.task.length === 0) {
+                return res.status(404).json({ success: false, message: "No tasks found" });
+            }
             Notification.processTask(tasks.task)
+
             res.status(HTTP_STATUS_CODES.SUCCESS).json({
                 success: true,
                 data: tasks
@@ -56,12 +60,12 @@ export class TasksController {
             res.status(500).json({
                 success: false,
                 message: "Failed to fetch next Sunday tasks",
-                error:error
+                error: error
             });
         }
 
     }
 
-    
-      
+
+
 }

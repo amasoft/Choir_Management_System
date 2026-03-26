@@ -10,8 +10,8 @@ export class TasksService {
             users: users
         }
     }
-    
-     async fetchTasks() {
+
+    async fetchTasks() {
         const tasks = await tasksRepo.fetchAllTasks()
 
         return {
@@ -20,13 +20,26 @@ export class TasksService {
 
         }
     }
-     async fetchNextTasks() {
-        const nextSunday=getNextSundayRange()
-     const nextTask= await tasksRepo.getNextSundayTask(nextSunday)
-     return{
-        task:nextTask
-     }
+    //  async fetchNextTasks() {
+    //     const nextSunday=getNextSundayRange()
+    //  const nextTask= await tasksRepo.getNextSundayTask(nextSunday)
+    //  return{
+    //     task:nextTask
+    //  }
 
+    // }
+
+
+    async fetchNextTasks() {
+        try {
+            const nextSunday = getNextSundayRange();
+            const nextTask = await tasksRepo.getNextSundayTask(nextSunday);
+
+            return { task: nextTask || null };  // Explicit null if empty
+        } catch (error) {
+            console.error('Error fetching next Sunday tasks:', error);
+            throw new Error('Failed to fetch tasks');  // Or custom TaskError
+        }
     }
-    
+
 }

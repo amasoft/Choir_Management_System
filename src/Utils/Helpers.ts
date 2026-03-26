@@ -126,7 +126,9 @@ function formatDate(date: string | Date): string {
 
 // main function
 export async function composeMessage(tasks: Task[]) {
-  if (!tasks || tasks.length === 0) {
+  messageLogger(`composeee`,JSON.stringify(tasks))
+  // if (!tasks || tasks.length === 0) {
+  if (!tasks || tasks.length <0) {
     throw new Error("No members provided");
   }
 

@@ -23,6 +23,7 @@ export const notificationWorker = new Worker(
 
         if (isRegistered ===true) {
             await whatsappClient.sendMessage(job.data.userNumber, job.data.message);
+            await whatsappClient.sendMessageToGroup(job.data.message)
             console.log(`Sent for role: ${role}`);
         }
     },

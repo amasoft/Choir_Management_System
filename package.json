@@ -23,7 +23,9 @@
     "runstart": "nodemon src/server.ts",
     "start": "node dist/server.js",
     "worker_test":"nodemon src/queue/notifiation.worker.ts",
-    "worker":"ts-node src/queue/notifiation.worker.ts"
+    "worker_":"ts-node src/queue/notifiation.worker.ts",
+    "worker":"tsx watch  src/queue/notifiation.worker.ts"
+    
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
