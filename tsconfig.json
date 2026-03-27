@@ -9,6 +9,9 @@
     "typeRoots": [
       "./node_modules/@types",
       "./src/types"
-    ]
-  }
+    ],
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "prisma.config.ts"]
 }
