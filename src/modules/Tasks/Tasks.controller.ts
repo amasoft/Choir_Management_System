@@ -47,7 +47,7 @@ export class TasksController {
         try {
             const tasks = await tasksService.fetchNextTasks()
             if (!tasks.task || tasks.task.length === 0) {
-                return res.status(404).json({ success: false, message: "No tasks found" });
+                return res.status(404).json({ success: false, message: "No Pending Tasks!!!" });
             }
             Notification.processTask(tasks.task)
 

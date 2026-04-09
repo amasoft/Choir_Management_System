@@ -3,6 +3,7 @@
   "packageManager": "yarn@4.9.1",
   "dependencies": {
     "@prisma/client": "^6.16.1",
+    "axios": "^1.13.6",
     "bullmq": "^5.71.0",
     "cloudinary": "^2.9.0",
     "dotenv": "^17.3.1",
@@ -16,24 +17,19 @@
     "xlsx": "^0.18.5"
   },
   "scripts": {
-    "dev_bef": "tsx watch src/server.ts",
     "dev": "nodemon --exec ts-node src/server.ts",
-    "prisma_studio": "npx prisma studio",
     "build": "tsc",
-    "runstart": "nodemon src/server.ts",
     "start": "node dist/server.js",
-    "start_queue": "node dist/queue/notifiation.worker.ts",
-    "start_all": "node dist/server.js & node dist/queue/notifiation.worker.js",
-
-
-    "worker_test":"nodemon src/queue/notifiation.worker.ts",
-    "worker_":"ts-node src/queue/notifiation.worker.ts",
-    "worker":"node dist/queue/notifiation.worker.js"
-    
+    "prisma_studio": "npx prisma studio",
+    "start:worker": "node dist/queue/notifiation.worker.js",
+    "start:all": "node dist/server.js & node dist/queue/notification.worker.js",
+    "worker:dev": "ts-node src/queue/notifiation.worker.ts",
+    "worker": "nodemon src/queue/notifiation.worker.ts"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
     "@types/node": "^25.3.3",
+    "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"

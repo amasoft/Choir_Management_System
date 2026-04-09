@@ -30,16 +30,19 @@ interface Task {
 
 export class Notification {
   static async processTask(result: Task[]) {
+    messageLogger('ProcessTask result:',result)
     try {
       const communionSoloTasks = result.filter((task: Task) => task.role === "COMMUNION_SOLO");
       const responsorialPsalmTasks = result.filter((task: Task) => task.role === "RESPNSORIAL_PASALM");
       const roles = ["COMMUNION_SOLO", "RESPNSORIAL_PASALM"];
-
+      
       for (const role of roles) {
         const tasks = result.filter(task => task.role == role)
+          messageLogger('tasks:: tasks', tasks)
 
         if (tasks.length == 0) {
           messageLogger('No TASK role :: LOOP', role)
+          continue
         }
 
         // messageLogger(' TASKS  :: LOOP', tasks)
