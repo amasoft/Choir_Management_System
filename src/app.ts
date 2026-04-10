@@ -9,7 +9,7 @@ import { registerScheduler } from "./queue/schedular/schedular";
 const app = express();
 app.use(express.json());
 
-
+console.log("Amadi REDIS:", process.env.REDIS_URL);
 
 
 app.use((req, res, next) => {
