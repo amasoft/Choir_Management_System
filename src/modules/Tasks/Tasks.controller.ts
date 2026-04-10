@@ -44,6 +44,8 @@ export class TasksController {
 
     }
     static async getNextSundayTasks(req: Request, res: Response) {
+
+        messageLogger(`getNextSundayTasks`,`Time::  ${new Date()}`)
         try {
             const tasks = await tasksService.fetchNextTasks()
             if (!tasks.task || tasks.task.length === 0) {

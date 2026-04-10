@@ -24,7 +24,8 @@
     "start:worker": "node dist/queue/notifiation.worker.js",
     "start:all": "node dist/server.js & node dist/queue/notification.worker.js",
     "worker:dev": "ts-node src/queue/notifiation.worker.ts",
-    "worker": "nodemon src/queue/notifiation.worker.ts"
+    "worker_local": "nodemon src/queue/notifiation.worker.ts",
+    "worker": "node dist/queue/notification.worker.js"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",

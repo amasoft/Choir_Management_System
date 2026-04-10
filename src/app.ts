@@ -5,6 +5,7 @@ import apiRouter from "./modules"
 import importExcelData from "./Utils/fileutils"
 import { convertDOB } from "./Utils/Helpers";
 import { sendSMS } from "./Utils/autoSMS";
+import { registerScheduler } from "./queue/schedular/schedular";
 const app = express();
 app.use(express.json());
 
@@ -15,6 +16,12 @@ app.use((req, res, next) => {
   console.log(`${req.method} ${req.url}`);
   next();
 });
+
+async function bootstrap() {
+  await registerScheduler();
+}
+
+bootstrap();
 app.use("/api/v1", apiRouter)
 async function startApp() {
   try {
