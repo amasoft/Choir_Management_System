@@ -10,6 +10,7 @@
     "express": "^5.2.1",
     "ioredis": "^5.10.1",
     "joi": "^18.0.2",
+    "multer": "^2.1.1",
     "nodemon": "^3.1.14",
     "prisma": "^6.16.1",
     "qrcode-terminal": "^0.12.0",
@@ -18,8 +19,7 @@
   },
   "scripts": {
     "dev": "nodemon --exec ts-node src/server.ts",
-      "build": "tsc && cp -r src/Utils dist/Utils",
-
+    "build": "tsc && cp -r src/Utils dist/Utils",
     "start": "node dist/server.js",
     "prisma_studio": "npx prisma studio",
     "start:worker": "node dist/queue/notifiation.worker.js",
@@ -30,6 +30,7 @@
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
+    "@types/multer": "^2",
     "@types/node": "^25.3.3",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",

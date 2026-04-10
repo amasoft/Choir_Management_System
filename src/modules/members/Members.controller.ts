@@ -2,12 +2,22 @@ import { Request, Response, NextFunction } from "express";
 import { messageLogger } from "../../util";
 import importExcelData from "../../Utils/fileutils";
 import { MembersService } from "./Members.service";
+import { tryCatch } from "bullmq";
 const membersService = new MembersService()
 export class MembersController {
     static async createMembers(req: Request, res: Response) {
-        messageLogger('MembersController', 'welcome to controller memebers')
-        const result = await membersService.uploadMembers()
+        try {
+             if (!req.file) {
+      return res.status(400).json({ message: "File is required" });
+    }
+
+            messageLogger('MembersController', 'welcome to controller memebers')
+        const result = await membersService.uploadMembers(req.file)
         res.status(200).json(result)
+        } catch (error) {
+            
+        }
+        
     }
 
     static async listMembers(req: Request, res: Response) {

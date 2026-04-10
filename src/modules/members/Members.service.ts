@@ -2,9 +2,9 @@ import importExcelData from "../../Utils/fileutils"
 import { MemberRepository } from "./Member.repository"
 const membersRepo = new MemberRepository()
 export class MembersService {
-    async uploadMembers() {
+    async uploadMembers(file:Express.Multer.File) {
 
-        const users = await importExcelData()
+        const users = await importExcelData(file)
         return {
             users: users
         }
