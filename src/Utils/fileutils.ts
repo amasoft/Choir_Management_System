@@ -1,6 +1,8 @@
 import fs from "fs";
 import path from "path";
-import xlsx from "xlsx";
+// import xlsx from "xlsx";
+import * as XLSX from "xlsx";
+
 import dotenv from "dotenv";
 import { v2 as cloudinary } from "cloudinary";
 import { Prisma, PrismaClient } from "@prisma/client";
@@ -51,17 +53,19 @@ cloudinary.config({
   api_key: "846724566362618",
   api_secret: "tkF0FuVwROUarxfdMb_HwueeV2k",
 });
-async function importExcelData(): Promise<importResult> {
-  const filePath = path.resolve(__dirname, "members_data.xlsx");
+async function importExcelData(filePath:Express.Multer.File): Promise<importResult> {
+  // const filePath = path.resolve(__dirname, "members_data.xlsx");
+  // const filePath = path.resolve(__dirname, "members_data.xlsx");
 
   try {
     console.log("📂 Reading Excel File...");
+    const workbook = XLSX.read(filePath.buffer, { type: "buffer" });
 
-    const workbook = xlsx.readFile(filePath);
+    // const workbook = xlsx.readFile(filePath);
     const sheetName = workbook.SheetNames[0];
     const worksheet = workbook.Sheets[sheetName];
 
-    const jsonData = xlsx.utils.sheet_to_json<ExcelRow>(worksheet);
+    const jsonData = XLSX.utils.sheet_to_json<ExcelRow>(worksheet);
 
     if (jsonData.length === 0) {
       console.log("No data found in Excel file.");
@@ -145,13 +149,13 @@ async function importExcelData(): Promise<importResult> {
  */
 function saveToExcel(data: ProcessedUser[], fileName: string): void {
   try {
-    const worksheet = xlsx.utils.json_to_sheet(data);
+    const worksheet = XLSX.utils.json_to_sheet(data);
 
-    const workbook = xlsx.utils.book_new();
+    const workbook = XLSX.utils.book_new();
 
-    xlsx.utils.book_append_sheet(workbook, worksheet, "Users");
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Users");
 
-    xlsx.writeFile(workbook, fileName);
+    XLSX.writeFile(workbook, fileName);
 
     console.log(`✅ Successfully saved processed data to ${fileName}`);
   } catch (error) {
