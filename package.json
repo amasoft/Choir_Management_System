@@ -18,7 +18,8 @@
   },
   "scripts": {
     "dev": "nodemon --exec ts-node src/server.ts",
-    "build": "tsc",
+      "build": "tsc && cp -r src/Utils dist/Utils",
+
     "start": "node dist/server.js",
     "prisma_studio": "npx prisma studio",
     "start:worker": "node dist/queue/notifiation.worker.js",
