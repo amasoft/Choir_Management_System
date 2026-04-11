@@ -566,7 +566,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/multer@npm:^2":
+"@types/multer@npm:^2.1.0":
   version: 2.1.0
   resolution: "@types/multer@npm:2.1.0"
   dependencies:
@@ -646,7 +646,7 @@ __metadata:
   dependencies:
     "@prisma/client": "npm:^6.16.1"
     "@types/express": "npm:^5.0.6"
-    "@types/multer": "npm:^2"
+    "@types/multer": "npm:^2.1.0"
     "@types/node": "npm:^25.3.3"
     axios: "npm:^1.13.6"
     bullmq: "npm:^5.71.0"
