@@ -1,14 +1,17 @@
 import { Queue } from "bullmq";
 import IORedis from "ioredis";
-const redisUrl = process.env.REDIS_URL || "redis://127.0.0.1:6379";
+// const redisUrl = process.env.REDIS_URL || "127.0.0.1:6379";
 
 // const connection = {
 //   host: redisUrl,
 //   port: 6379,
 //   maxRetriesPerRequest: null // ⚠ Must be null for BullMQ
 // };
-export const connection = new IORedis(process.env.REDIS_URL!, {
-  maxRetriesPerRequest: null
+// const redisUrl = process.env.REDIS_URL || "redis://127.0.0.1:6379";
+const redisUrl = process.env.REDIS_URL || "127.0.0.1";
+
+export const connection = new IORedis(redisUrl, {
+  maxRetriesPerRequest: null,
 });
 export const bullMQconnection = {
   host: redisUrl,
@@ -16,7 +19,7 @@ export const bullMQconnection = {
   maxRetriesPerRequest: null // ⚠ Must be null for BullMQ
 };
 
-console.log("REDIS  URL:", process.env.REDIS_URL);
+console.log("REDIS  URL:", redisUrl);
 // Create Queue
 export const notificationQueue = new Queue("choir-notifications", {
   connection,
