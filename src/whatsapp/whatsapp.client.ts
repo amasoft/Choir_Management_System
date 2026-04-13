@@ -14,13 +14,27 @@ class WhatsAppClient {
       authStrategy: new LocalAuth({
         clientId: "choir-system",
       }),
-      puppeteer: {
-        args: [
-          "--no-sandbox",
-          "--disable-setuid-sandbox",
-          "--disable-dev-shm-usage",
-        ],
-      },
+      // puppeteer: {
+      //   args: [
+      //     "--no-sandbox",
+      //     "--disable-setuid-sandbox",
+      //     "--disable-dev-shm-usage",
+      //   ],
+      // },
+
+
+
+       puppeteer: {
+    headless: true,
+    executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined,
+    args: [
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+      "--disable-dev-shm-usage",
+      "--single-process",
+      "--no-zygote"
+    ],
+  },
     });
 
     this.initialize();
