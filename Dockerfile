@@ -39,13 +39,12 @@
 # CMD ["yarn", "start"]
 
 
-
 FROM node:18
 
-# install chrome dependencies
 RUN apt-get update && apt-get install -y \
   libnss3 libatk1.0-0 libcups2 libx11-xcb1 libxcomposite1 \
-  libxdamage1 libxrandr2 libgbm1 libgtk-3-0 libasound2
+  libxdamage1 libxrandr2 libgbm1 libgtk-3-0 libasound2 \
+  libglib2.0-0
 
 WORKDIR /app
 
@@ -56,4 +55,5 @@ COPY . .
 
 RUN npm run build
 
-CMD ["node", "dist/worker.js"]
+# IMPORTANT: force worker
+CMD ["node", "dist/queue/notifiation.worker.js"]
