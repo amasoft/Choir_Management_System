@@ -2,7 +2,8 @@
 // queue/notification.worker.ts
 import { Worker } from "bullmq";
 // import { connection } from "./connection";
-import { bullMQconnection } from "./notification.queue";
+import { connection } from "./notification.queue";
+// import { bullMQconnection, connection } from "./notification.queue";
 import { messageLogger } from "../util";
 import { whatsappClient } from "../whatsapp/whatsapp.client";
 import { sendSMS } from "../Utils/autoSMS";
@@ -50,5 +51,9 @@ messageLogger(`Sunday job triggered`,`Time  ${new Date()}`)
             console.log(`Sent for role: ${role}`);
         }
     },
-    { connection: bullMQconnection }
+    // { connection: bullMQconnection }
+    { connection: connection }
 );
+
+
+// bullMQconnection
