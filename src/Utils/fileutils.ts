@@ -58,7 +58,7 @@ async function importExcelData(filePath:Express.Multer.File): Promise<importResu
   // const filePath = path.resolve(__dirname, "members_data.xlsx");
 
   try {
-    console.log("📂 Reading Excel File...");
+    console.log(" Reading Excel File...");
     const workbook = XLSX.read(filePath.buffer, { type: "buffer" });
 
     // const workbook = xlsx.readFile(filePath);
@@ -77,7 +77,7 @@ async function importExcelData(filePath:Express.Multer.File): Promise<importResu
       };
     }
 
-    console.log(`📊 Found ${jsonData.length} records. Processing...`);
+    console.log(`Found ${jsonData.length} records. Processing...`);
 
     const userPromises = jsonData.map(async (row): Promise<ProcessedUser | null> => {
       try {
@@ -102,7 +102,7 @@ async function importExcelData(filePath:Express.Multer.File): Promise<importResu
           profile_pic: cloudinaryUrl,
         };
       } catch (error) {
-        console.error("❌ Error processing row:", error);
+        console.error("Error processing row:", error);
         return null;
       }
     });

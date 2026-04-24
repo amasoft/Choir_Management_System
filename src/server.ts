@@ -9,3 +9,5 @@ app.listen(PORT, async() => {
   await checkDatabaseConnection()
   console.log(`Server running on port ${PORT}`);
 });
+
+// DATABASE_URL="postgresql://patrick_sales_system:patricksales2025@localhost:5432/HTC_DB?schema=public"
