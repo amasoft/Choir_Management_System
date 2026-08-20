@@ -29,15 +29,26 @@ export class TaskRepository {
 
   // }
 
-  async getNextSundayTask(nextSunday:Date){
-    messageLogger(`startdate`,nextSunday)
-  return  prisma.task.findMany({
-            where: {
-                performanceDate: new Date(nextSunday)
-            },
-            include:{
-              member:true
-            }
-        });
-      }
+  async getNextSundayTask(nextSunday: Date) {
+    messageLogger(`startdate`, nextSunday)
+    return prisma.task.findMany({
+        where: {
+            performanceDate: new Date(nextSunday),
+            isTaskDone: false
+        },
+        include: {
+            member: true
+        }
+    });
+  }
+
+  // Stamps lastReminderSentAt = now for exactly the given tasks. Called only
+  // after their notification jobs have actually been enqueued successfully.
+  async markReminderSent(taskIds: string[]) {
+    if (taskIds.length === 0) return;
+    return prisma.task.updateMany({
+      where: { id: { in: taskIds } },
+      data: { lastReminderSentAt: new Date() },
+    });
+  }
 }

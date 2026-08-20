@@ -1,23 +1,15 @@
 import { Request, Response, NextFunction } from "express";
-import { createTaskValidator } from "../../validators/task.validator";
 import { HTTP_STATUS_CODES, STATUS_MESSAGES } from "../../Utils/Constants/statusCodes";
 import { TasksService } from "./Tasks.service";
 import { messageLogger } from "../../util";
 import { getNextSundayRange } from "../../Utils/Helpers";
 import { json } from "node:stream/consumers";
-import { Notification } from "../NOtifications/Notification.controller";
 const tasksService = new TasksService()
 export class TasksController {
     static async createTask(req: Request, res: Response) {
         messageLogger('TASK controller', 'Create task ')
-        const { error } = createTaskValidator.validate(req.body)
-        if (error) {
-            return res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({
-                message: STATUS_MESSAGES.BAD_REQUEST,
-                error
-            })
-        }
-
+        // Body is already validated by validateTaskBody, earlier in the route
+        // chain (see Tasks.route.ts) — no need to re-validate here.
         const task = await tasksService.createTask(req.body)
         return res.status(HTTP_STATUS_CODES.SUCCESS).json({
             message: "Task created Successfully!!!",
@@ -51,7 +43,11 @@ export class TasksController {
             if (!tasks.task || tasks.task.length === 0) {
                 return res.status(404).json({ success: false, message: "No Pending Tasks!!!" });
             }
-            Notification.processTask(tasks.task)
+            // This endpoint only reads data now — it used to also trigger real
+            // WhatsApp/SMS sends as a side effect of a GET request, which meant
+            // anyone hitting it (a refresh, a health check, a monitoring bot)
+            // could re-send reminders. Sending is now handled exclusively by
+            // the scheduled worker (see schedular.ts / notification.worker.ts).
 
             res.status(HTTP_STATUS_CODES.SUCCESS).json({
                 success: true,

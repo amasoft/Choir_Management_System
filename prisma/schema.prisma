@@ -34,6 +34,12 @@ model Task {
   performanceDate DateTime
   isTaskDone       Boolean @default(false)
   reminderSent    Boolean  @default(false)
+  // When a reminder was last actually sent for this task. Used as a cooldown
+  // (see REMINDER_COOLDOWN_HOURS in Notification.controller.ts) rather than
+  // a one-shot flag, so the legitimate Monday/Wednesday/Saturday reminders
+  // (days apart) all still fire, while accidental rapid re-firing within a
+  // short window (a misconfigured test schedule, a duplicate trigger) does not.
+  lastReminderSentAt DateTime?
   createdAt       DateTime @default(now())
   member          Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
   role             roleType

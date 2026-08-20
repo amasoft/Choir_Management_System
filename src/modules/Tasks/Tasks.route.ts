@@ -1,9 +1,10 @@
 import Router from "express";
 import { TasksController } from "./Tasks.controller";
-import { checkMemberExist, checkTasksExist } from "../../middlewares/tasks.middleware";
+import { validateTaskBody, checkMemberExist, checkTasksExist } from "../../middlewares/tasks.middleware";
 const tasksRouter = Router();
 
-tasksRouter.post("/", 
+tasksRouter.post("/",
+    validateTaskBody,
     checkMemberExist,
      checkTasksExist,
      TasksController.createTask

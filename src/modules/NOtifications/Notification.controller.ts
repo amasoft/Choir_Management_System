@@ -1,6 +1,7 @@
-import { addNotificationJob } from "../../queue/notification.queue";
+import { addNotificationJob, NotificationChannels } from "../../queue/notification.queue";
 import { messageLogger } from "../../util";
 import { composeMessage } from "../../Utils/Helpers";
+import { TaskRepository } from "../Tasks/Tasks.repository";
 // import { whatsappClient } from "../../whatsapp/whatsapp.client";
 
 interface Member {
@@ -23,13 +24,80 @@ interface Task {
   performanceDate: Date;
   isTaskDone: boolean;
   reminderSent: boolean;
+  lastReminderSentAt: Date | null;
   createdAt: Date;
   role: "COMMUNION_SOLO" | "RESPNSORIAL_PASALM";
   member: Member;
 }
 
+// Default to every channel when no explicit choice is passed in (e.g. the
+// manual /nexttasks endpoint), so existing behaviour doesn't change for it.
+const ALL_CHANNELS: NotificationChannels = { dm: true, group: true, sms: true };
+
+const taskRepository = new TaskRepository();
+
+// How long to wait before allowing another reminder for the same task.
+// Long enough to never block the real weekly cadence (Monday → Wednesday
+// is 2 days apart, Wednesday → Saturday is 3) — short enough to still
+// block accidental rapid re-firing (a misconfigured test schedule, a
+// duplicate trigger registration) within the same day.
+const REMINDER_COOLDOWN_HOURS = 12;
+
+function wasRecentlyReminded(task: Task): boolean {
+  if (!task.lastReminderSentAt) return false;
+  const hoursSinceLastReminder =
+    (Date.now() - new Date(task.lastReminderSentAt).getTime()) / (1000 * 60 * 60);
+  return hoursSinceLastReminder < REMINDER_COOLDOWN_HOURS;
+}
+
 export class Notification {
-  static async processTask(result: Task[]) {
+  static async processTask(result: Task[], channels: NotificationChannels = ALL_CHANNELS) {
+    const roles: Task["role"][] = ["COMMUNION_SOLO", "RESPNSORIAL_PASALM"];
+    const errors: unknown[] = [];
+
+    for (const role of roles) {
+      // Only tasks matching this role, and not already reminded recently —
+      // this is what actually prevents the repeated-resend bug we hit,
+      // without blocking the intentional Monday/Wednesday/Saturday cadence.
+      const tasks = result.filter(
+        (task) => task.role === role && !wasRecentlyReminded(task)
+      );
+
+      if (tasks.length === 0) {
+        messageLogger("No eligible tasks for role", role);
+        continue;
+      }
+
+      try {
+        const { message, phoneNumbers } = await composeMessage(tasks);
+
+        for (const number of phoneNumbers) {
+          await addNotificationJob({ message, userNumber: number, role, channels });
+        }
+
+        // Only mark as reminded once every job for this role's tasks has
+        // actually been enqueued successfully.
+        await taskRepository.markReminderSent(tasks.map((t) => t.id));
+      } catch (error) {
+        messageLogger(`Failed to process reminders for role ${role}`, error);
+        errors.push(error);
+      }
+    }
+
+    // Rethrown deliberately, after both roles have been attempted —
+    // swallowing this entirely would mark the job "completed" in BullMQ
+    // even though a send failed, silently losing the automatic retry
+    // (3 attempts, exponential backoff) already configured on this queue.
+    // Any role that did succeed already marked its tasks as reminded, so a
+    // retry only re-attempts the role that actually failed.
+    if (errors.length > 0) {
+      throw new Error(
+        `processTask failed for ${errors.length} role(s): ${errors.map(String).join("; ")}`
+      );
+    }
+  }
+
+  static async processTaskv1(result: Task[], channels: NotificationChannels = ALL_CHANNELS) {
     messageLogger('ProcessTask result:',result)
     try {
       const communionSoloTasks = result.filter((task: Task) => task.role === "COMMUNION_SOLO");
@@ -52,8 +120,9 @@ const { message, phoneNumbers } = await composeMessage(tasks);
 for (const number of phoneNumbers) {
   await addNotificationJob({
     message,
-    userNumber: number
-    // role,
+    userNumber: number,
+    role,
+    channels
   });
 }
 
