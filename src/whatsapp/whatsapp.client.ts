@@ -8,6 +8,7 @@ import { messageLogger } from "../util";
 class WhatsAppClient {
   private client: Client;
   private isReady: boolean = false;
+  private    started   : boolean = false;
 
   constructor() {
     this.client = new Client({
@@ -32,16 +33,27 @@ class WhatsAppClient {
       "--disable-setuid-sandbox",
       "--disable-dev-shm-usage",
       "--single-process",
-      "--no-zygote"
+      "--no-zygote",
+      // This machine has no working IPv6 route, but web.whatsapp.com's DNS
+      // record includes an IPv6 address that Chromium tries first — causing
+      // navigation to hang until it times out instead of falling back to
+      // IPv4 quickly. Forcing IPv4-only avoids that entirely.
+      "--disable-ipv6"
     ],
   },
     });
-
-    this.initialize();
+    // Deliberately not started here — see start() below. Constructing this
+    // class should be cheap and side-effect-free; launching the actual
+    // browser is an explicit step the app boot sequence opts into.
   }
 
-  // ✅ Initialize WhatsApp client safely
-  private initialize() {
+  // ✅ Launch the browser + wire up event listeners. Call this once, explicitly,
+  // from app startup (see app.ts) — importing this file must not be enough
+  // to spin up a real Chromium process as a hidden side effect.
+  public start() {
+    if (this.started) return;
+    this.started = true;
+
     this.client.on("qr", (qr) => {
       console.log("📱 Scan the QR code below:");
       qrcode.generate(qr, { small: true });
@@ -66,13 +78,17 @@ class WhatsAppClient {
       this.isReady = false;
 
       console.log("🔄 Reinitializing WhatsApp...");
-      await this.client.initialize();
+      try {
+        await this.client.initialize();
+      } catch (err) {
+        console.error("❌ Reinitialization error:", err);
+      }
     });
 
     this.client.on("message", async (mesg) => {
-      console.log("📩 Message received from:", mesg.id.remote);
+      // console.log("📩 Message received from:", mesg.id.remote+ mesg.body);
 
-      if (mesg.body === "check") {
+      if (mesg.body == "check") {
         const sender = mesg.id.remote.split("@")[0];
 
         if (sender === "2347064795401") {
@@ -118,6 +134,14 @@ class WhatsAppClient {
   }
 
   // ✅ Send message (safe + waits automatically)
+  //
+  // Deliberately does NOT retry on failure. We've confirmed that a thrown
+  // error here doesn't reliably mean "nothing was sent" — client.sendMessage()
+  // can successfully deliver the message and still throw while trying to
+  // build/return its confirmation (an open whatsapp-web.js compatibility
+  // issue with this account). Retrying on an error we can't trust risks a
+  // genuine duplicate send to a real person, which is worse than a failure
+  // a human can notice and act on from the log.
   public async sendMessage(phone: string, message: string) {
     console.log(`📤 SEND MESSAGE::: ${phone} ::: ${message}`);
 
@@ -127,53 +151,35 @@ class WhatsAppClient {
       const formattedPhone = `${phone}@c.us`;
       return await this.client.sendMessage(formattedPhone, message);
     } catch (error) {
-      messageLogger("SendMessage error", error);
-
-      // ✅ Retry once (basic resilience)
-      console.log("🔁 Retrying message...");
-      await new Promise((res) => setTimeout(res, 2000));
-
-      try {
-        const formattedPhone = `${phone}@c.us`;
-        return await this.client.sendMessage(formattedPhone, message);
-      } catch (retryError) {
-        messageLogger("Retry failed", retryError);
-      }
+      messageLogger("SendMessage error — NOT auto-retrying (see comment above)", error);
     }
   }
 
-  // ✅ Find group safely
-  public async findGroupByName(groupName: string) {
-    await this.waitUntilReady();
-
-    const chats = await this.client.getChats();
-
-    const group = chats.find(
-      (chat) =>
-        chat.isGroup &&
-        chat.name.toLowerCase() === groupName.toLowerCase()
-    );
-
-    if (!group) {
-      throw new Error(`Group "${groupName}" not found`);
-    }
-
-    return group;
-  }
+  // "Testing" group's real chat ID, captured once via the message event
+  // listener (see the "message" handler above). getChats() — which a
+  // name-based lookup would depend on — currently throws for this
+  // account/library combination (tracked as an open whatsapp-web.js
+  // compatibility issue), so this hardcodes the ID to bypass it entirely
+  // rather than depend on a fix. If the group is ever recreated (a new
+  // group has a different ID even with the same name), this needs updating.
+  private readonly TESTING_GROUP_ID = "120363392575308546@g.us";
 
   // ✅ Send message to group
+  //
+  // Deliberately does NOT retry on failure — same reasoning as sendMessage()
+  // above. We've directly observed this call deliver a message successfully
+  // while its own promise still threw, so a caught error here can't be
+  // trusted to mean "nothing sent." Retrying risks a real duplicate message
+  // to the whole group.
   public async sendMessageToGroup(message: string) {
     try {
       await this.waitUntilReady();
 
-      const group = await this.findGroupByName("Testing");
-      const groupId = group.id._serialized;
+      console.log("📢 Sending to group:", this.TESTING_GROUP_ID);
 
-      console.log("📢 Sending to group:", groupId);
-
-      return await this.client.sendMessage(groupId, message);
+      return await this.client.sendMessage(this.TESTING_GROUP_ID, message);
     } catch (error) {
-      messageLogger("sendMessageToGroup error", error);
+      messageLogger("sendMessageToGroup error — NOT auto-retrying (see comment above)", error);
     }
   }
 }
