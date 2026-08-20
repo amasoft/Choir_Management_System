@@ -1,11 +1,12 @@
 import express from "express";
-// import { whatsappClient } from "./whatsapp/whatsapp.client";
+import { whatsappClient } from "./whatsapp/whatsapp.client";
 import { messageLogger } from "./util";
 import apiRouter from "./modules"
 import importExcelData from "./Utils/fileutils"
 import { convertDOB } from "./Utils/Helpers";
 import { sendSMS } from "./Utils/autoSMS";
 import { registerScheduler } from "./queue/schedular/schedular";
+import { checkDatabaseConnection } from "./config/DBConnection";
 const app = express();
 app.use(express.json());
 
@@ -19,9 +20,16 @@ app.use((req, res, next) => {
 
 async function bootstrap() {
   await registerScheduler();
+  // Explicitly starts the WhatsApp client — launches the headless browser
+  // and begins login/session-restore. Kept explicit (rather than a side
+  // effect of importing notification.worker.ts) so this startup sequence
+  // is a complete, honest list of everything that boots.
+  whatsappClient.start();
 }
 
-bootstrap();
+bootstrap().catch((error) => {
+  console.error("Failed to complete app bootstrap:", error);
+});
 app.use("/api/v1", apiRouter)
 async function startApp() {
   try {
@@ -61,6 +69,10 @@ app.get("/sms", async (req, res) => {
 
   await sendSMS(data)
 })
+app.get("/health", async (req, res) => {
+  const dbOk = await checkDatabaseConnection();
+  res.status(dbOk ? 200 : 503).json({ db: dbOk });
+});
 app.get("/", async (req, res) => {
   console.log('welcome')
   const { phone, message } = req.body;
