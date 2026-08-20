@@ -1,0 +1,27 @@
+# Real secrets — DB password, Termii API key. Must never be baked into the
+# image; the container should get these injected at runtime instead.
+.env
+
+# The live, already-authenticated WhatsApp session. Baking this in means
+# anyone with the image can use the real WhatsApp account with no login —
+# this should live in a mounted volume at runtime, not inside the image.
+.wwebjs_auth/
+.wwebjs_cache/
+.session/
+
+# Reinstalled fresh inside the image — copying the host's own node_modules
+# in would also risk shipping host-specific native binaries that don't
+# match the container's platform.
+node_modules
+
+# Rebuilt inside the image by `yarn build`.
+dist/
+
+# Repo history isn't needed to run the app, and could contain old secrets
+# from earlier commits.
+.git
+
+.yarn/install-state.gz
+*.log
+*.rdb
+docker-compose.yml

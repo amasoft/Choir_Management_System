@@ -2,7 +2,7 @@
   "name": "HTC_Notification_system",
   "packageManager": "yarn@4.9.1",
   "dependencies": {
-    "@prisma/client": "^6.16.1",
+    "@prisma/client": "6.19.3",
     "axios": "^1.13.6",
     "bullmq": "^5.71.0",
     "cloudinary": "^2.9.0",
@@ -12,16 +12,18 @@
     "joi": "^18.0.2",
     "multer": "^2.1.1",
     "nodemon": "^3.1.14",
-    "prisma": "^6.16.1",
+    "prisma": "6.19.3",
     "qrcode-terminal": "^0.12.0",
-    "whatsapp-web.js": "^1.34.6",
+    "whatsapp-web.js": "1.34.7",
     "xlsx": "^0.18.5"
   },
   "scripts": {
-    "dev": "nodemon --exec ts-node src/server.ts",
+    "dev": "(redis-cli ping > /dev/null 2>&1 || redis-server --daemonize yes) && nodemon --exec ts-node src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "worker": "node dist/queue/notifiation.worker.js",
+    "redis:start": "redis-server",
+    "worker": "node dist/queue/notification.worker.js",
+    "worker_dev": "nodemon --exec ts-node src/queue/notification.worker.ts",
     "postinstall": "prisma generate"
   },
   "devDependencies": {

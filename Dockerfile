@@ -23,7 +23,17 @@ RUN apt-get update && apt-get install -y \
 RUN corepack enable
 
 # copy package files first
-COPY package.json yarn.lock ./
+COPY package.json yarn.lock .yarnrc.yml ./
+# .yarnrc.yml sets `nodeLinker: node-modules` — without it present before
+# `yarn install`, Yarn Berry falls back to its default Plug'n'Play linker
+# instead, a fundamentally different resolution mode that breaks native
+# postinstall scripts (this is what was actually causing the prisma
+# postinstall failure, not the schema timing or version pinning).
+#
+# `yarn install` below triggers the "postinstall": "prisma generate" hook
+# automatically — it needs the schema to already be present, so it has to
+# arrive before `yarn install`, not with the rest of the source afterward.
+COPY prisma ./prisma
 
 RUN yarn install
 
@@ -39,7 +49,12 @@ RUN yarn build
 # create WhatsApp session folder (fix EACCES)
 RUN mkdir -p /app/.wwebjs_auth && chmod -R 777 /app/.wwebjs_auth
 
-CMD ["node", "dist/server.js"]
+# `prisma generate` (above) only regenerates the Prisma Client's TypeScript
+# code — it does not touch the actual database. `migrate deploy` is the
+# separate step that applies any pending migrations (e.g. adding
+# lastReminderSentAt) to whatever database DATABASE_URL points at, so the
+# schema the code expects actually exists before the app starts serving.
+CMD npx prisma migrate deploy && node dist/server.js
 # FROM node:22-bullseye
 
 # WORKDIR /app
@@ -130,7 +145,7 @@ CMD ["node", "dist/server.js"]
 # RUN npm run build
 
 # # IMPORTANT: force worker
-# CMD ["node", "dist/queue/notifiation.worker.js"]
+# CMD ["node", "dist/queue/notification.worker.js"]
 
 
 
