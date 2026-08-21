@@ -124,15 +124,25 @@ function formatDate(date: string | Date): string {
   return new Date(date).toDateString();
 }
 
+// Display-only formatting: "COMMUNION_SOLO" -> "Communion Solo". The stored/
+// compared value (task.role, the DB enum) never changes — this only affects
+// how it reads in the message a member actually receives.
+function formatRole(role: string): string {
+  return role
+    .toLowerCase()
+    .split("_")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
 // main function
 export async function composeMessage(tasks: Task[]) {
   messageLogger(`composeee`,JSON.stringify(tasks))
-  // if (!tasks || tasks.length === 0) {
-  if (!tasks || tasks.length <0) {
+  if (!tasks || tasks.length === 0) {
     throw new Error("No members provided");
   }
 
-  const role = tasks[0].role;
+  const role = formatRole(tasks[0].role);
   const dueDate = formatDate(tasks[0].performanceDate);
 
   const namesArray = tasks.map(t => t.member.surname);
