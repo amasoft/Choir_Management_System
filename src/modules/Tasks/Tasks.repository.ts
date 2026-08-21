@@ -14,7 +14,7 @@ export class TaskRepository {
     memberId: string;
     performanceDate: Date;
     notes: string;
-    role: "RESPNSORIAL_PASALM" | "COMMUNION_SOLO";
+    role: "RESPONSORIAL_PSALM" | "COMMUNION_SOLO";
   }) {
     return prisma.task.create({
       data: {

@@ -48,8 +48,8 @@ model Task {
 
 
 enum roleType {
-  RESPNSORIAL_PASALM
+  RESPONSORIAL_PSALM
   COMMUNION_SOLO
-  
+
 }
  // @@unique([memberId, performanceDate])

@@ -11,6 +11,6 @@ notes:Joi.string(),
   performanceDate: Joi.date().required(),
 
   role: Joi.string()
-    .valid("RESPNSORIAL_PASALM", "COMMUNION_SOLO")
+    .valid("RESPONSORIAL_PSALM", "COMMUNION_SOLO")
     .required()
 });

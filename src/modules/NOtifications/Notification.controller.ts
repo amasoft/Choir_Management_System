@@ -26,7 +26,7 @@ interface Task {
   reminderSent: boolean;
   lastReminderSentAt: Date | null;
   createdAt: Date;
-  role: "COMMUNION_SOLO" | "RESPNSORIAL_PASALM";
+  role: "COMMUNION_SOLO" | "RESPONSORIAL_PSALM";
   member: Member;
 }
 
@@ -52,7 +52,7 @@ function wasRecentlyReminded(task: Task): boolean {
 
 export class Notification {
   static async processTask(result: Task[], channels: NotificationChannels = ALL_CHANNELS) {
-    const roles: Task["role"][] = ["COMMUNION_SOLO", "RESPNSORIAL_PASALM"];
+    const roles: Task["role"][] = ["COMMUNION_SOLO", "RESPONSORIAL_PSALM"];
     const errors: unknown[] = [];
 
     for (const role of roles) {
@@ -101,8 +101,8 @@ export class Notification {
     messageLogger('ProcessTask result:',result)
     try {
       const communionSoloTasks = result.filter((task: Task) => task.role === "COMMUNION_SOLO");
-      const responsorialPsalmTasks = result.filter((task: Task) => task.role === "RESPNSORIAL_PASALM");
-      const roles = ["COMMUNION_SOLO", "RESPNSORIAL_PASALM"];
+      const responsorialPsalmTasks = result.filter((task: Task) => task.role === "RESPONSORIAL_PSALM");
+      const roles = ["COMMUNION_SOLO", "RESPONSORIAL_PSALM"];
       
       for (const role of roles) {
         const tasks = result.filter(task => task.role == role)
@@ -133,7 +133,7 @@ for (const number of phoneNumbers) {
         // await addNotificationJob(data)
       }
       // console.log("COMMUNION_SOLO tasks:", communionSoloTasks.length);
-      // console.log("RESPNSORIAL_PASALM tasks:", responsorialPsalmTasks.length);
+      // console.log("RESPONSORIAL_PSALM tasks:", responsorialPsalmTasks.length);
 
       //+2347063011279
       //check compose message 
