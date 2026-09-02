@@ -24,3 +24,4 @@ dist/
 docker-compose.yml
 *.log
 *.rdb
+choir-ui/

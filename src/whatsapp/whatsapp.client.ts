@@ -86,7 +86,7 @@ class WhatsAppClient {
     });
 
     this.client.on("message", async (mesg) => {
-      // console.log("📩 Message received from:", mesg.id.remote+ mesg.body);
+      // console.log("📩 Message received from:",+23409099933955 mesg.id.remote+ mesg.body);
 
       if (mesg.body == "check") {
         const sender = mesg.id.remote.split("@")[0];

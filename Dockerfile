@@ -2,7 +2,7 @@
 
 
 
-FROM node:22-bullseye
+FROM node:22-bullseyehttps://anthropic.gallerycdn.vsassets.io/extensions/anthropic/claude-code/2.1.251/1787941357199/Microsoft.VisualStudio.Services.Icons.Default?targetPlatform=linux-x64
 
 WORKDIR /app
 

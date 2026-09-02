@@ -23,7 +23,7 @@
 // #     image: redis:7
 // #     container_name: choir-redis
 
-// # working now
+// # working now https://choirmanagementsystem-production-e806.up.railway.app/api/v1/tasks/listtasks
 // # version: "3.8"
 
 // # services:
@@ -94,7 +94,7 @@
 //   worker:
 //     build: .
 //     container_name: choir_worker
-//     command: node dist/queue/notifiation.worker.js
+//     command: node dist/queue/notification.worker.js
 //     depends_on:
 //       - redis
 //       - postgres
